@@ -13,8 +13,19 @@
   </head>
   <body>
     <section class="vh-100 gradient-custom">
+      <div class="d-flex justify-content-end mt-3 me-2">
+        <a href="/api/v1/admin/login">
+          <button
+            data-mdb-button-init
+            data-mdb-ripple-init
+            class="btn bg-dark btn-outline-light btn-lg px-5"
+          >
+            Admin Login
+          </button>
+        </a>
+      </div>
       <form action="/api/v1/login" method="post">
-        <div class="container py-5 h-100">
+        <div class="container py-1 h-100">
           <div
             class="row d-flex justify-content-center align-items-center h-100"
           >

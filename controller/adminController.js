@@ -1,23 +1,49 @@
 const User = require('../models/userModel');
 
 async function renderAdminLogin(req, res) {
-  res.render('adminLogin.ejs');
+  //checking if user is logged in
+  const user = req.user;
+  if (!user) {
+    return res.render('adminLogin.ejs');
+  }
+  res.redirect('/api/v1/admin/users');
 }
 
 async function handlerAdminLogin(req, res) {
   const { email, password } = req.body;
-
-  const admin = await User.findOne({ email });
-
-  const isPassword = await admin.comparePassword(password);
-  if (!isPassword) {
-    return res.render('adminLogin.ejs', { msg: 'Incorrect Password' });
+  if (!email || !password) {
+    return res.render('adminLogin.ejs', { msg: 'Fields cannot be empty' });
   }
+  try {
+    const admin = await User.findOne({ email });
+    //checking for empty fields
+    if (!admin) {
+      return res.render('adminLogin.ejs', { msg: 'Admin Not Found' });
+    }
+    //checking password
+    const isPassword = await admin.comparePassword(password);
+    if (!isPassword && admin) {
+      return res.render('adminLogin.ejs', { msg: 'Incorrect Password' });
+    }
+    //checking admin authorization
+    if (!admin.isAdmin) {
+      return res.render('adminLogin.ejs', { msg: 'Not Authorized' });
+    }
+    const token = admin.createJwt();
+    res.cookie('jwt', token);
 
-  res.redirect('/api/v1/admin/users');
+    res.redirect('/api/v1/admin/users');
+  } catch (error) {
+    res.render('adminLogin.ejs', { msg: error });
+  }
 }
 
 async function handlerAllUsers(req, res) {
+  //checking if user is logged in
+  const user = req.user;
+  if (!user) {
+    return res.redirect('/api/v1/admin/login');
+  }
   const AllUser = await User.find({});
   res.render('adminPanel.ejs', { users: AllUser });
 }
@@ -25,6 +51,7 @@ async function handlerAllUsers(req, res) {
 async function handlerDeleteUser(req, res) {
   const { id: userId } = req.params;
   try {
+    //finding user to delete
     await User.deleteOne({ _id: userId });
     const AllUser = await User.find({});
     res.render('adminPanel.ejs', { users: AllUser });
@@ -74,11 +101,18 @@ async function handlerCreateUser(req, res) {
   }
 }
 
+function handlerAdminLogout(req, res) {
+  //clearing cookie while logging out
+  res.clearCookie('jwt');
+  res.redirect('/api/v1/admin/login');
+}
+
 module.exports = {
-  handlerAdminLogin,
   renderAdminLogin,
+  renderNewUserSignup,
+  handlerAdminLogin,
   handlerAllUsers,
   handlerDeleteUser,
   handlerCreateUser,
-  renderNewUserSignup,
+  handlerAdminLogout,
 };

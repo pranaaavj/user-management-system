@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 require('express-async-errors');
 
 const authenticateUser = require('./middlewares/userAuthenticate');
+const authorizeAdmin = require('./middlewares/adminAuth');
 const { connectDB } = require('./db/connection');
 
 const errorHandlerMiddleware = require('./middlewares/errorHandling');
@@ -28,7 +29,7 @@ app.get('/tryout', (req, res) => {
 });
 
 app.use('/api/v1', authenticateUser, userRoute);
-app.use('/api/v1/admin', adminRoute);
+app.use('/api/v1/admin', authorizeAdmin, adminRoute);
 
 // app.use(errorHandlerMiddleware);
 app.use(notFoundMiddleware);
