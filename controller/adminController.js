@@ -33,8 +33,45 @@ async function handlerDeleteUser(req, res) {
   }
 }
 
+async function renderNewUserSignup(req, res) {
+  return res.render('newUserPage.ejs');
+}
+
 async function handlerCreateUser(req, res) {
   const { firstName, lastName, email, password, isAdmin } = req.body;
+  //check for empty fields
+  if (!firstName || !lastName || !email || !password) {
+    return res.render('newUserPage.ejs', { msg: 'Fields cannot be empty' });
+  }
+  //checking for existing user
+  const user = await User.find({
+    email,
+  });
+
+  if (user.length < 1) {
+    try {
+      //creating new user
+      await User.create({
+        firstName,
+        lastName,
+        email,
+        password,
+        isAdmin,
+      });
+
+      res.redirect('/api/v1/admin/users');
+    } catch (error) {
+      //throwing custom error message
+      const customError = {};
+      if (error.name == 'ValidationError') {
+        customError.msg = Object.values(error.errors)
+          .map((err) => err.message)
+          .join(',');
+      }
+
+      res.render('newUserPage.ejs', { msg: customError.msg });
+    }
+  }
 }
 
 module.exports = {
@@ -43,4 +80,5 @@ module.exports = {
   handlerAllUsers,
   handlerDeleteUser,
   handlerCreateUser,
+  renderNewUserSignup,
 };

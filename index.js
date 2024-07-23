@@ -24,7 +24,7 @@ app.use(cookieParser());
 app.use(nocache());
 
 app.get('/tryout', (req, res) => {
-  res.render('signupBackup.ejs');
+  res.render('newUserPage.ejs');
 });
 
 app.use('/api/v1', authenticateUser, userRoute);
