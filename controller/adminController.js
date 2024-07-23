@@ -3,7 +3,7 @@ const User = require('../models/userModel');
 async function renderAdminLogin(req, res) {
   //checking if user is logged in
   const user = req.user;
-  if (!user) {
+  if (!user?.isAdmin) {
     return res.render('adminLogin.ejs');
   }
   res.redirect('/api/v1/admin/users');
@@ -41,7 +41,7 @@ async function handlerAdminLogin(req, res) {
 async function handlerAllUsers(req, res) {
   //checking if user is logged in
   const user = req.user;
-  if (!user) {
+  if (!user?.isAdmin) {
     return res.redirect('/api/v1/admin/login');
   }
   const AllUser = await User.find({});
@@ -62,7 +62,7 @@ async function handlerDeleteUser(req, res) {
 
 async function renderNewUserSignup(req, res) {
   const user = req.user;
-  if (!user) {
+  if (!user?.isAdmin) {
     return res.redirect('/api/v1/admin/login');
   }
   res.render('newUserPage.ejs');

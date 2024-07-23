@@ -49,6 +49,7 @@ UserSchema.methods.createJwt = function () {
       userId: this._id,
       name: this.firstName,
       email: this.email,
+      isAdmin: this.isAdmin,
     },
     process.env.JWT_SECRET,
     {

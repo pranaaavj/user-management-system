@@ -9,6 +9,7 @@ async function authorizeAdmin(req, res, next) {
         userId: payload.userId,
         name: payload.name,
         email: payload.email,
+        isAdmin: payload.isAdmin,
       };
       next();
     } catch (error) {
