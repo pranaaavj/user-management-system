@@ -13,7 +13,6 @@ const {
 router.route('/').get(renderHomePage);
 router.route('/login').get(renderLogin).post(handlerUserLogin);
 router.route('/signup').get(renderSignup).post(handlerSignUp);
-
 router.get('/logout', handlerUserLogout);
 
 module.exports = router;

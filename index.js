@@ -24,10 +24,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(nocache());
 
-app.get('/tryout', (req, res) => {
-  res.render('newUserPage.ejs');
-});
-
 app.use('/api/v1', authenticateUser, userRoute);
 app.use('/api/v1/admin', authorizeAdmin, adminRoute);
 

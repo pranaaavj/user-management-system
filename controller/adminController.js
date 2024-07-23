@@ -61,7 +61,11 @@ async function handlerDeleteUser(req, res) {
 }
 
 async function renderNewUserSignup(req, res) {
-  return res.render('newUserPage.ejs');
+  const user = req.user;
+  if (!user) {
+    return res.redirect('/api/v1/admin/login');
+  }
+  res.render('newUserPage.ejs');
 }
 
 async function handlerCreateUser(req, res) {
