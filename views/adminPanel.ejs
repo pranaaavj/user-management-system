@@ -207,9 +207,27 @@
           <div class="table-responsive">
             <div class="table-wrapper">
               <div class="table-title">
-                <div class="row">
+                <div class="row d-flex">
                   <div>
                     <h2>User <b>Management</b></h2>
+                  </div>
+                  <div class="input-group mb-3 d-flex align-items-end">
+                    <form action="/api/v1/admin/users/search?find">
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Recipient's username"
+                        aria-label="Recipient's username"
+                        aria-describedby="button-addon2"
+                      />
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="submit"
+                        id="button-addon2"
+                      >
+                        Button
+                      </button>
+                    </form>
                   </div>
                   <div class="">
                     <a href="/api/v1/admin/logout" class="btn btn-primary"
@@ -256,12 +274,21 @@
                     </td>
                     <td>
                       <form
-                        action="/api/v1/admin/users/<%= user._id %>"
+                        action="/api/v1/admin/users/delete/<%= user._id %>?_method=DELETE"
                         method="post"
                       >
                         <button>
                           <i class="material-icons">&#xE5C9;</i>
                           <span>Delete</span>
+                        </button>
+                      </form>
+                      <form
+                        action="/api/v1/admin/users/edit/<%= user._id %>"
+                        method="get"
+                      >
+                        <button>
+                          <i class="material-icons">&#xE5C9;</i>
+                          <span>Edit</span>
                         </button>
                       </form>
                     </td>

@@ -1,11 +1,13 @@
 const express = require('express');
 require('dotenv').config();
-const nocache = require('nocache');
-const cookieParser = require('cookie-parser');
 require('express-async-errors');
+const cookieParser = require('cookie-parser');
+const nocache = require('nocache');
+const methodOverride = require('method-override');
 
 const authenticateUser = require('./middlewares/userAuthenticate');
 const authorizeAdmin = require('./middlewares/adminAuth');
+
 const { connectDB } = require('./db/connection');
 
 const errorHandlerMiddleware = require('./middlewares/errorHandling');
@@ -23,6 +25,7 @@ app.use(express.static('views'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(nocache());
+app.use(methodOverride('_method'));
 
 app.use('/api/v1', authenticateUser, userRoute);
 app.use('/api/v1/admin', authorizeAdmin, adminRoute);

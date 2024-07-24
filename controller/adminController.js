@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const bcrypt = require('bcryptjs');
 
 async function renderAdminLogin(req, res) {
   //checking if user is logged in
@@ -44,11 +45,17 @@ async function handlerAllUsers(req, res) {
   if (!user?.isAdmin) {
     return res.redirect('/api/v1/admin/login');
   }
+  //dynamically rendering all users
   const AllUser = await User.find({});
   res.render('adminPanel.ejs', { users: AllUser });
 }
 
 async function handlerDeleteUser(req, res) {
+  //checking if user is logged in
+  const user = req.user;
+  if (!user?.isAdmin) {
+    return res.redirect('/api/v1/admin/login');
+  }
   const { id: userId } = req.params;
   try {
     //finding user to delete
@@ -60,7 +67,48 @@ async function handlerDeleteUser(req, res) {
   }
 }
 
+async function renderEditUserPage(req, res) {
+  //checking if user is logged in
+  const user = req.user;
+  const {
+    params: { id },
+  } = req;
+  if (!user?.isAdmin) {
+    return res.redirect('/api/v1/admin/login');
+  }
+  //sending user details to ejs
+  const oldUser = await User.findById({ _id: id });
+  return res.render('editUserPage.ejs', { id: id, msg: '', users: [oldUser] });
+}
+
+async function handlerEditUser(req, res) {
+  //checking if user is logged in
+  const user = req.user;
+  if (!user?.isAdmin) {
+    return res.redirect('/api/v1/admin/login');
+  }
+  const {
+    params: { id },
+    body,
+  } = req;
+  try {
+    //finding user and updating
+    const user = await User.findByIdAndUpdate(
+      { _id: id },
+      {
+        ...body,
+        password: await hashPassword(body.password),
+        isAdmin: Boolean(body.isAdmin),
+      }
+    );
+    res.status(200).redirect('/api/v1/admin/users');
+  } catch (error) {
+    res.render('editUserPage.ejs', { msg: 'An error occured' });
+  }
+}
+
 async function renderNewUserSignup(req, res) {
+  //checking if user is logged in
   const user = req.user;
   if (!user?.isAdmin) {
     return res.redirect('/api/v1/admin/login');
@@ -87,7 +135,7 @@ async function handlerCreateUser(req, res) {
         lastName,
         email,
         password,
-        isAdmin,
+        isAdmin: Boolean(isAdmin),
       });
 
       res.redirect('/api/v1/admin/users');
@@ -111,12 +159,19 @@ function handlerAdminLogout(req, res) {
   res.redirect('/api/v1/admin/login');
 }
 
+async function hashPassword(password) {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
+}
+
 module.exports = {
   renderAdminLogin,
   renderNewUserSignup,
+  renderEditUserPage,
   handlerAdminLogin,
   handlerAllUsers,
   handlerDeleteUser,
+  handlerEditUser,
   handlerCreateUser,
   handlerAdminLogout,
 };
