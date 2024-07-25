@@ -52,6 +52,12 @@ async function handlerAllUsers(req, res) {
     const users = await User.find({
       firstName: { $regex: regex, $options: 'i' },
     });
+
+    if (users.length < 1) {
+      return res.render('adminPanel.ejs', {
+        msg: 'No user found',
+      });
+    }
     return res.render('adminPanel.ejs', { users: users });
   }
   //dynamically rendering all users
@@ -82,12 +88,20 @@ async function renderEditUserPage(req, res) {
   const {
     params: { id },
   } = req;
-  if (!user?.isAdmin) {
-    return res.redirect('/api/v1/admin/login');
+  try {
+    if (!user?.isAdmin) {
+      return res.redirect('/api/v1/admin/login');
+    }
+    //sending user details to ejs
+    const oldUser = await User.findById({ _id: id });
+    return res.render('editUserPage.ejs', {
+      id: id,
+      msg: '',
+      users: [oldUser],
+    });
+  } catch (error) {
+    return res.render('editUserPage.ejs', { msg: 'An error Occured' });
   }
-  //sending user details to ejs
-  const oldUser = await User.findById({ _id: id });
-  return res.render('editUserPage.ejs', { id: id, msg: '', users: [oldUser] });
 }
 
 async function handlerEditUser(req, res) {
