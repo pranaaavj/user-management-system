@@ -21,7 +21,6 @@ const URI = process.env.URI;
 const app = express();
 
 app.set('view-engine', 'ejs');
-app.use(express.static('views'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(nocache());

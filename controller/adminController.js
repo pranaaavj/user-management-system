@@ -1,3 +1,4 @@
+const { query } = require('express');
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 
@@ -44,6 +45,14 @@ async function handlerAllUsers(req, res) {
   const user = req.user;
   if (!user?.isAdmin) {
     return res.redirect('/api/v1/admin/login');
+  }
+  //grabbing the search query from search bar
+  const regex = req.query.search;
+  if (regex) {
+    const users = await User.find({
+      firstName: { $regex: regex, $options: 'i' },
+    });
+    return res.render('adminPanel.ejs', { users: users });
   }
   //dynamically rendering all users
   const AllUser = await User.find({});
@@ -159,6 +168,13 @@ function handlerAdminLogout(req, res) {
   res.redirect('/api/v1/admin/login');
 }
 
+async function handlerSearch(req, res) {
+  const {
+    query: { filter },
+  } = req;
+  console.log(query);
+}
+
 async function hashPassword(password) {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
@@ -174,4 +190,5 @@ module.exports = {
   handlerEditUser,
   handlerCreateUser,
   handlerAdminLogout,
+  handlerSearch,
 };

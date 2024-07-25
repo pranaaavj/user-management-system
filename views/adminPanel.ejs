@@ -212,9 +212,10 @@
                     <h2>User <b>Management</b></h2>
                   </div>
                   <div class="input-group mb-3 d-flex align-items-end">
-                    <form action="/api/v1/admin/users/search?find">
+                    <form action="/api/v1/admin/users" method="get">
                       <input
                         type="text"
+                        name="search"
                         class="form-control"
                         placeholder="Recipient's username"
                         aria-label="Recipient's username"
@@ -228,6 +229,14 @@
                         Button
                       </button>
                     </form>
+                    <div class="">
+                      <a href="/api/v1/admin/users" class="btn btn-primary"
+                        ><i
+                          class="material-icons d-flex justify-content-center"
+                        ></i>
+                        <span>Show All Users</span></a
+                      >
+                    </div>
                   </div>
                   <div class="">
                     <a href="/api/v1/admin/logout" class="btn btn-primary"
