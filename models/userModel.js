@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+//User Schema
 const UserSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -36,17 +36,17 @@ const UserSchema = new mongoose.Schema({
     default: false,
   },
 });
-
+//Hash Password
 UserSchema.pre('save', async function () {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
-
+//Compare Password
 UserSchema.methods.comparePassword = async function (userPassword) {
   const isPassword = bcrypt.compare(userPassword, this.password);
   return isPassword;
 };
-
+//Generating JWT Token
 UserSchema.methods.createJwt = function () {
   return jwt.sign(
     {

@@ -1,7 +1,7 @@
 const { query } = require('express');
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
-
+//GET Login
 async function renderAdminLogin(req, res) {
   //checking if user is logged in
   const user = req.user;
@@ -10,7 +10,7 @@ async function renderAdminLogin(req, res) {
   }
   res.status(200).redirect('/api/v1/admin/users');
 }
-
+//POST Login
 async function handlerAdminLogin(req, res) {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -47,7 +47,7 @@ async function handlerAdminLogin(req, res) {
     res.status(500).render('adminLogin.ejs', { msg: error });
   }
 }
-
+//GET Admin Dashboard
 async function handlerAllUsers(req, res) {
   //checking if user is logged in
   const user = req.user;
@@ -72,7 +72,7 @@ async function handlerAllUsers(req, res) {
   const AllUser = await User.find({});
   res.status(200).render('adminPanel.ejs', { users: AllUser });
 }
-
+//DELETE User
 async function handlerDeleteUser(req, res) {
   //checking if user is logged in
   const user = req.user;
@@ -91,7 +91,7 @@ async function handlerDeleteUser(req, res) {
       .render('adminPanel.ejs', { msg: 'Error occured while deleting user' });
   }
 }
-
+//POST Edit User
 async function renderEditUserPage(req, res) {
   //checking if user is logged in
   const user = req.user;
@@ -115,7 +115,7 @@ async function renderEditUserPage(req, res) {
       .render('editUserPage.ejs', { msg: 'An error Occured' });
   }
 }
-
+//PATCH User
 async function handlerEditUser(req, res) {
   //checking if user is logged in
   const user = req.user;
@@ -140,7 +140,7 @@ async function handlerEditUser(req, res) {
     res.status(500).render('editUserPage.ejs', { msg: 'An error occured' });
   }
 }
-
+//GET New User
 async function renderNewUserSignup(req, res) {
   //checking if user is logged in
   const user = req.user;
@@ -149,7 +149,7 @@ async function renderNewUserSignup(req, res) {
   }
   res.status(200).render('newUserPage.ejs');
 }
-
+//POST New User
 async function handlerCreateUser(req, res) {
   const { firstName, lastName, email, password, isAdmin } = req.body;
   //check for empty fields
@@ -190,17 +190,11 @@ async function handlerCreateUser(req, res) {
     res.status(500).render('newUserPage.ejs', { msg: customError.msg });
   }
 }
-
+//GET Logout
 function handlerAdminLogout(req, res) {
   //clearing cookie while logging out
   res.status(200).clearCookie('jwt');
   res.status(200).redirect('/api/v1/admin/login');
-}
-
-//function to hashPassword
-async function hashPassword(password) {
-  const salt = await bcrypt.genSalt(10);
-  return await bcrypt.hash(password, salt);
 }
 
 module.exports = {

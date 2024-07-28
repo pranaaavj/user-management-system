@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+//Checking if user have signed up
 function userAuthentication(req, res, next) {
   const token = req.cookies.jwt;
   if (token) {
@@ -14,6 +14,7 @@ function userAuthentication(req, res, next) {
       next();
     } catch (error) {
       console.log(error);
+      res.status(500).redirect('/api/v1/login');
     }
   } else {
     next();

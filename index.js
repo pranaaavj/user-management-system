@@ -1,7 +1,6 @@
 //modules
 const express = require('express');
 require('dotenv').config();
-require('express-async-errors');
 const cookieParser = require('cookie-parser');
 const nocache = require('nocache');
 const methodOverride = require('method-override');

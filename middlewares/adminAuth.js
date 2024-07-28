@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+//Checking if user is admin
 async function authorizeAdmin(req, res, next) {
   const token = req.cookies.jwt;
   if (token) {
@@ -14,7 +14,7 @@ async function authorizeAdmin(req, res, next) {
       next();
     } catch (error) {
       console.log(error);
-      res.redirect('/api/v1/login');
+      res.status(500).redirect('/api/v1/login');
     }
   } else {
     next();
