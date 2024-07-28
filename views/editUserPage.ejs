@@ -70,7 +70,7 @@
                         <label for="email" class="form-label">Email</label>
                       </div>
                     </div>
-                    <div class="col-12">
+                    <!-- <div class="col-12">
                       <div class="form-floating mb-3">
                         <input
                           type="password"
@@ -83,7 +83,8 @@
                           >Password</label
                         >
                       </div>
-                    </div>
+                    </div> -->
+                    <% if (!user.isSuperAdmin) { %>
                     <div class="col-12">
                       <div class="form-check">
                         <input
@@ -100,7 +101,7 @@
                         </label>
                       </div>
                     </div>
-                    <% }) %> <% } %>
+                    <% } %> <% }) %> <% } %>
                     <div
                       id="emailHelp"
                       class="form-text fs-6 fw-bold text-danger mb-4 fs-5 text-center"
@@ -110,7 +111,7 @@
                     <div class="col-12">
                       <div class="d-grid">
                         <button class="btn btn-primary btn-lg" type="submit">
-                          Sign up
+                          Confirm Changes
                         </button>
                       </div>
                     </div>

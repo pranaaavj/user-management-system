@@ -72,6 +72,9 @@ async function handlerDeleteUser(req, res) {
     return res.redirect('/api/v1/admin/login');
   }
   const { id: userId } = req.params;
+  if (userId == user.userId && user.isSuperAdmin) {
+    return res.render('adminPanel.ejs');
+  }
   try {
     //finding user to delete
     await User.deleteOne({ _id: userId });
@@ -120,7 +123,6 @@ async function handlerEditUser(req, res) {
       { _id: id },
       {
         ...body,
-        password: await hashPassword(body.password),
         isAdmin: Boolean(body.isAdmin),
       }
     );
@@ -150,9 +152,9 @@ async function handlerCreateUser(req, res) {
     email,
   });
 
-  if (user.length < 1) {
-    try {
-      //creating new user
+  try {
+    //creating new user
+    if (user.length < 1) {
       await User.create({
         firstName,
         lastName,
@@ -160,19 +162,19 @@ async function handlerCreateUser(req, res) {
         password,
         isAdmin: Boolean(isAdmin),
       });
-
-      res.redirect('/api/v1/admin/users');
-    } catch (error) {
-      //throwing custom error message
-      const customError = {};
-      if (error.name == 'ValidationError') {
-        customError.msg = Object.values(error.errors)
-          .map((err) => err.message)
-          .join(',');
-      }
-
-      res.render('newUserPage.ejs', { msg: customError.msg });
+      return res.redirect('/api/v1/admin/users');
     }
+    return res.render('newUserPage.ejs', { msg: 'User Already Exists' });
+  } catch (error) {
+    //throwing custom error message
+    const customError = {};
+    if (error.name == 'ValidationError') {
+      customError.msg = Object.values(error.errors)
+        .map((err) => err.message)
+        .join(',');
+    }
+
+    res.render('newUserPage.ejs', { msg: customError.msg });
   }
 }
 
@@ -182,13 +184,7 @@ function handlerAdminLogout(req, res) {
   res.redirect('/api/v1/admin/login');
 }
 
-async function handlerSearch(req, res) {
-  const {
-    query: { filter },
-  } = req;
-  console.log(query);
-}
-
+//function to hashPassword
 async function hashPassword(password) {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
@@ -204,5 +200,4 @@ module.exports = {
   handlerEditUser,
   handlerCreateUser,
   handlerAdminLogout,
-  handlerSearch,
 };

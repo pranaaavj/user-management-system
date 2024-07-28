@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isSuperAdmin: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 UserSchema.pre('save', async function () {
