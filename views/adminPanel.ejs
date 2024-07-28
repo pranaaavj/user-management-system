@@ -232,6 +232,7 @@
         border-color: #dc3545;
       }
       .btn-secondary {
+        color: white;
         background-color: #6c757d;
         border-color: #6c757d;
       }
@@ -258,10 +259,14 @@
           <div class="table-title">
             <div class="row d-flex">
               <div class="d-flex align-items-end">
-                <h2>User <b>Management</b></h2>
+                <h2>Admin Dashboard</h2>
               </div>
               <div class="">
-                <a href="/api/v1/admin/logout" class="btn btn-primary">
+                <a
+                  href="/api/v1/admin/logout"
+                  class="btn btn-warning"
+                  style="background-color: #e1e115"
+                >
                   <span>Logout</span>
                 </a>
               </div>
@@ -279,7 +284,7 @@
                   type="text"
                   name="search"
                   class="form-control w-50"
-                  placeholder="Recipient's username"
+                  placeholder="Enter first name"
                 />
                 <div style="margin: 10px">
                   <button
@@ -289,7 +294,11 @@
                   >
                     Search
                   </button>
-                  <a href="/api/v1/admin/users" class="btn btn-primary">
+                  <a
+                    href="/api/v1/admin/users"
+                    style="background-color: #666"
+                    class="btn btn-primary"
+                  >
                     <span>Show All Users</span>
                   </a>
                 </div>
@@ -341,7 +350,7 @@
                       style="margin: 10px"
                       method="get"
                     >
-                      <button class="btn btn-danger">
+                      <button class="btn btn-secondary">
                         <span>Edit</span>
                       </button>
                     </form>

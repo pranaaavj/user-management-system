@@ -4,54 +4,62 @@ function renderHomePage(req, res) {
   const user = req.user;
   //checking for cookie
   if (!user) {
-    return res.redirect('/api/v1/login');
+    return res.status(401).redirect('/api/v1/login');
   }
-  return res.render('home.ejs');
+  return res.status(200).render('home.ejs');
 }
 
 function renderLogin(req, res) {
   const user = req.user;
   //checking for cookie
   if (!user) {
-    return res.render('loginPage.ejs');
+    return res.status(401).render('loginPage.ejs');
   }
-  res.redirect('/api/v1/');
+  res.status(200).redirect('/api/v1/');
 }
 
 function renderSignup(req, res) {
-  res.render('signupPage.ejs');
+  res.status(200).render('signupPage.ejs');
 }
 
 async function handlerUserLogin(req, res, next) {
   const { password, email } = req.body;
   //checking for empty fields
   if ((!password, !email)) {
-    return res.render('loginPage.ejs', { msg: 'Fields Cannot be Empty' });
+    return res
+      .status(400)
+      .render('loginPage.ejs', { msg: 'Fields Cannot be Empty' });
   }
   //checking user in db
   const user = await User.findOne({
     email,
   });
   if (!user) {
-    return res.render('loginPage.ejs', { msg: 'No User Found, Please Signup' });
+    return res
+      .status(404)
+      .render('loginPage.ejs', { msg: 'No User Found, Please Signup' });
   }
   //checking password
   const isPassword = await user.comparePassword(password);
   if (!isPassword) {
-    return res.render('loginPage.ejs', { msg: 'Incorrect Password' });
+    return res
+      .status(401)
+      .render('loginPage.ejs', { msg: 'Incorrect Password' });
   }
   //attaching cookie
   const token = user.createJwt();
   res.cookie('jwt', token);
   // console.log(res.cookie);
-  return res.redirect('/api/v1/');
+  return res.status(200).redirect('/api/v1/');
 }
 
 async function handlerSignUp(req, res) {
   const { firstName, lastName, email, password } = req.body;
   //checking for empty fields
   if (!firstName || !lastName || !email || !password) {
-    return res.render('signupPage.ejs', { msg: 'Feilds Cannot Be Empty !!' });
+    return res
+      .status(400)
+      .render('signupPage.ejs', { msg: 'Feilds Cannot Be Empty !!' });
   }
   //checking for existing user
   const user = await User.find({
@@ -66,10 +74,12 @@ async function handlerSignUp(req, res) {
         email,
         password,
       });
-      return res.redirect('/api/v1/login');
+      return res.status(201).redirect('/api/v1/login');
     }
     //error if user already exists
-    return res.render('signupPage.ejs', { msg: 'User Already Exists' });
+    return res
+      .status(409)
+      .render('signupPage.ejs', { msg: 'User Already Exists' });
   } catch (error) {
     const customError = {};
     //throwing custom error
@@ -78,14 +88,14 @@ async function handlerSignUp(req, res) {
         return err.message;
       })
       .join(',');
-    return res.render('signupPage.ejs', { msg: customError.msg });
+    return res.status(500).render('signupPage.ejs', { msg: customError.msg });
   }
 }
 
 function handlerUserLogout(req, res) {
   //clearing cookie while logout
-  res.clearCookie('jwt');
-  return res.redirect('/api/v1/login');
+  res.status(200).clearCookie('jwt');
+  return res.status(200).redirect('/api/v1/login');
 }
 
 module.exports = {

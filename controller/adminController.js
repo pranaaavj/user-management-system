@@ -6,37 +6,45 @@ async function renderAdminLogin(req, res) {
   //checking if user is logged in
   const user = req.user;
   if (!user?.isAdmin) {
-    return res.render('adminLogin.ejs');
+    return res.status(200).render('adminLogin.ejs');
   }
-  res.redirect('/api/v1/admin/users');
+  res.status(200).redirect('/api/v1/admin/users');
 }
 
 async function handlerAdminLogin(req, res) {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.render('adminLogin.ejs', { msg: 'Fields cannot be empty' });
+    return res
+      .status(400)
+      .render('adminLogin.ejs', { msg: 'Fields cannot be empty' });
   }
   try {
     const admin = await User.findOne({ email });
     //checking for empty fields
     if (!admin) {
-      return res.render('adminLogin.ejs', { msg: 'Admin Not Found' });
+      return res
+        .status(400)
+        .render('adminLogin.ejs', { msg: 'Admin Not Found' });
     }
     //checking password
     const isPassword = await admin.comparePassword(password);
     if (!isPassword && admin) {
-      return res.render('adminLogin.ejs', { msg: 'Incorrect Password' });
+      return res
+        .status(400)
+        .render('adminLogin.ejs', { msg: 'Incorrect Password' });
     }
     //checking admin authorization
     if (!admin.isAdmin) {
-      return res.render('adminLogin.ejs', { msg: 'Not Authorized' });
+      return res
+        .status(401)
+        .render('adminLogin.ejs', { msg: 'Not Authorized' });
     }
     const token = admin.createJwt();
     res.cookie('jwt', token);
 
-    res.redirect('/api/v1/admin/users');
+    res.status(202).redirect('/api/v1/admin/users');
   } catch (error) {
-    res.render('adminLogin.ejs', { msg: error });
+    res.status(500).render('adminLogin.ejs', { msg: error });
   }
 }
 
@@ -44,7 +52,7 @@ async function handlerAllUsers(req, res) {
   //checking if user is logged in
   const user = req.user;
   if (!user?.isAdmin) {
-    return res.redirect('/api/v1/admin/login');
+    return res.status(401).redirect('/api/v1/admin/login');
   }
   //grabbing the search query from search bar
   const regex = req.query.search;
@@ -54,34 +62,33 @@ async function handlerAllUsers(req, res) {
     });
 
     if (users.length < 1) {
-      return res.render('adminPanel.ejs', {
+      return res.status(404).render('adminPanel.ejs', {
         msg: 'No user found',
       });
     }
-    return res.render('adminPanel.ejs', { users: users });
+    return res.status(200).render('adminPanel.ejs', { users: users });
   }
   //dynamically rendering all users
   const AllUser = await User.find({});
-  res.render('adminPanel.ejs', { users: AllUser });
+  res.status(200).render('adminPanel.ejs', { users: AllUser });
 }
 
 async function handlerDeleteUser(req, res) {
   //checking if user is logged in
   const user = req.user;
   if (!user?.isAdmin) {
-    return res.redirect('/api/v1/admin/login');
+    return res.status(401).redirect('/api/v1/admin/login');
   }
   const { id: userId } = req.params;
-  if (userId == user.userId && user.isSuperAdmin) {
-    return res.render('adminPanel.ejs');
-  }
   try {
     //finding user to delete
     await User.deleteOne({ _id: userId });
     const AllUser = await User.find({});
-    res.render('adminPanel.ejs', { users: AllUser });
+    res.status(200).render('adminPanel.ejs', { users: AllUser });
   } catch (error) {
-    res.render('adminPanel.ejs', { msg: 'Error occured while deleting user' });
+    res
+      .status(500)
+      .render('adminPanel.ejs', { msg: 'Error occured while deleting user' });
   }
 }
 
@@ -93,17 +100,19 @@ async function renderEditUserPage(req, res) {
   } = req;
   try {
     if (!user?.isAdmin) {
-      return res.redirect('/api/v1/admin/login');
+      return res.status(401).redirect('/api/v1/admin/login');
     }
     //sending user details to ejs
     const oldUser = await User.findById({ _id: id });
-    return res.render('editUserPage.ejs', {
+    return res.status(200).render('editUserPage.ejs', {
       id: id,
       msg: '',
       users: [oldUser],
     });
   } catch (error) {
-    return res.render('editUserPage.ejs', { msg: 'An error Occured' });
+    return res
+      .status(500)
+      .render('editUserPage.ejs', { msg: 'An error Occured' });
   }
 }
 
@@ -111,7 +120,7 @@ async function handlerEditUser(req, res) {
   //checking if user is logged in
   const user = req.user;
   if (!user?.isAdmin) {
-    return res.redirect('/api/v1/admin/login');
+    return res.status(401).redirect('/api/v1/admin/login');
   }
   const {
     params: { id },
@@ -128,7 +137,7 @@ async function handlerEditUser(req, res) {
     );
     res.status(200).redirect('/api/v1/admin/users');
   } catch (error) {
-    res.render('editUserPage.ejs', { msg: 'An error occured' });
+    res.status(500).render('editUserPage.ejs', { msg: 'An error occured' });
   }
 }
 
@@ -136,16 +145,18 @@ async function renderNewUserSignup(req, res) {
   //checking if user is logged in
   const user = req.user;
   if (!user?.isAdmin) {
-    return res.redirect('/api/v1/admin/login');
+    return res.status(401).redirect('/api/v1/admin/login');
   }
-  res.render('newUserPage.ejs');
+  res.status(200).render('newUserPage.ejs');
 }
 
 async function handlerCreateUser(req, res) {
   const { firstName, lastName, email, password, isAdmin } = req.body;
   //check for empty fields
   if (!firstName || !lastName || !email || !password) {
-    return res.render('newUserPage.ejs', { msg: 'Fields cannot be empty' });
+    return res
+      .status(400)
+      .render('newUserPage.ejs', { msg: 'Fields cannot be empty' });
   }
   //checking for existing user
   const user = await User.find({
@@ -162,9 +173,11 @@ async function handlerCreateUser(req, res) {
         password,
         isAdmin: Boolean(isAdmin),
       });
-      return res.redirect('/api/v1/admin/users');
+      return res.status(201).redirect('/api/v1/admin/users');
     }
-    return res.render('newUserPage.ejs', { msg: 'User Already Exists' });
+    return res
+      .status(409)
+      .render('newUserPage.ejs', { msg: 'User Already Exists' });
   } catch (error) {
     //throwing custom error message
     const customError = {};
@@ -174,14 +187,14 @@ async function handlerCreateUser(req, res) {
         .join(',');
     }
 
-    res.render('newUserPage.ejs', { msg: customError.msg });
+    res.status(500).render('newUserPage.ejs', { msg: customError.msg });
   }
 }
 
 function handlerAdminLogout(req, res) {
   //clearing cookie while logging out
-  res.clearCookie('jwt');
-  res.redirect('/api/v1/admin/login');
+  res.status(200).clearCookie('jwt');
+  res.status(200).redirect('/api/v1/admin/login');
 }
 
 //function to hashPassword
